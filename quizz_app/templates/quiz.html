@@ -1,0 +1,68 @@
+{# quiz.html #}
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }} - Quiz App{% endblock %}
+
+{% block content %}
+    <div class="quiz-container">
+        <h1>{{ quiz.title }}</h1>
+        <p class="quiz-description">{{ quiz.description }}</p>
+
+        {% if quiz.time_limit %}
+            <div class="timer" id="quiz-timer" data-time-limit="{{ quiz.time_limit }}">
+                Time remaining: <span id="time-display">{{ quiz.time_limit }}:00</span>
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('submit_quiz', quiz_id=quiz.id) }}" id="quiz-form">
+            {% for question in quiz.questions %}
+                <div class="question-container">
+                    <h3>Question {{ loop.index }}</h3>
+                    <p class="question-text">{{ question.question_text }}</p>
+
+                    {# Radio buttons for multiple choice options #}
+                    <div class="options-container">
+                        {% for option in ['a', 'b', 'c', 'd'] %}
+                            <div class="option">
+                                <input type="radio"
+                                       id="q{{ question.id }}_{{ option }}"
+                                       name="question{{ question.id }}"
+                                       value="{{ option }}"
+                                       required>
+                                <label for="q{{ question.id }}_{{ option }}">
+                                    {{ question['option_' + option] }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="button submit-quiz">Submit Quiz</button>
+        </form>
+    </div>
+
+    {# Include timer JavaScript only if there's a time limit #}
+    {% if quiz.time_limit %}
+        <script>
+            // Basic timer functionality
+            document.addEventListener('DOMContentLoaded', function() {
+                const timerDisplay = document.getElementById('time-display');
+                const timeLimit = parseInt(document.getElementById('quiz-timer').dataset.timeLimit);
+                let timeLeft = timeLimit * 60;  // Convert to seconds
+
+                const timer = setInterval(function() {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        document.getElementById('quiz-form').submit();
+                    }
+                }, 1000);
+            });
+        </script>
+    {% endif %}
+{% endblock %}

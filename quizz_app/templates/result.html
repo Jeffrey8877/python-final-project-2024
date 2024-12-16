@@ -1,0 +1,44 @@
+{# results.html #}
+{% extends "base.html" %}
+
+{% block title %}Quiz Results - Quiz App{% endblock %}
+
+{% block content %}
+    <div class="results-container">
+        <h1>Quiz Results</h1>
+        
+        <div class="quiz-info">
+            <h2>{{ quiz.title }}</h2>
+            <p>{{ quiz.description }}</p>
+        </div>
+        
+        <div class="score-display">
+            <h3>Your Score</h3>
+            <div class="score">{{ result.score }}%</div>
+            <div class="completion-time">
+                Completed on: {{ result.completed_at.strftime('%B %d, %Y at %I:%M %p') }}
+            </div>
+        </div>
+        
+        {% if quiz.passing_score %}
+            <div class="pass-fail">
+                {% if result.score >= quiz.passing_score %}
+                    <div class="pass">Passed! 🎉</div>
+                {% else %}
+                    <div class="fail">
+                        Did not pass. Required score: {{ quiz.passing_score }}%
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('take_quiz', quiz_id=quiz.id) }}" class="button">
+                Try Again
+            </a>
+            <a href="{{ url_for('index') }}" class="button">
+                Back to Quizzes
+            </a>
+        </div>
+    </div>
+{% endblock %}
